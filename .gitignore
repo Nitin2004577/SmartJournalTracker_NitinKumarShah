@@ -1,0 +1,15 @@
+bin/
+obj/
+*.user
+*.vs/
+*.vscode/
+*.dll
+*.pdb
+*.cache
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.apk
+*.aab
+*.keystore
