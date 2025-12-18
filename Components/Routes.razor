@@ -1,6 +1,34 @@
-﻿<Router AppAssembly="@typeof(MauiProgram).Assembly">
+﻿@using smart_journal.Pages
+@inject Services.AppState AppState
+
+@code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+
+        @if (!AppState.IsUnlocked)
+        {
+            <Lock />
+        }
+        else
+        {
+            <RouteView RouteData="@routeData"
+                       DefaultLayout="@typeof(Layout.MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        }
+
     </Found>
+    <NotFound>
+        <p>Page not found</p>
+    </NotFound>
 </Router>

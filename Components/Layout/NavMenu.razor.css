@@ -1,0 +1,47 @@
+
+/* Logo / App Name */
+.logo-container {
+    font-size: 20px;
+    font-weight: 600;
+    background-color:darkblue;
+    text-align: center;
+    padding-top:15px;
+    padding-bottom: 30px;
+    letter-spacing: 1px;
+    color: #e5e7eb;
+}
+
+/* Page List Wrapper */
+.page-list-container {
+    flex-grow: 1;
+}
+
+/* Page List */
+.pages-lists {
+    
+    font-weight:bold;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    /* Individual Page Item */
+    .pages-lists li {
+        padding: 12px 15px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: background-color 0.2s ease;
+    }
+
+        /* Hover Effect */
+        .pages-lists li:hover {
+            background-color: lightgray;
+        }
+
+        /* Active Page (optional) */
+        .pages-lists li.active {
+            background-color: #2563eb;
+            font-weight: 500;
+        }

@@ -1,0 +1,26 @@
+﻿@namespace smart_journal.Pages
+@inject smart_journal.Services.AppState AppState
+
+<h1>🔒 App Locked</h1>
+
+<input type="password" @bind="pin" placeholder="Enter PIN" />
+<button @onclick="Unlock">Unlock</button>
+
+<p style="color:red">@error</p>
+
+@code {
+    private string pin = "";
+    private string error = "";
+
+    private void Unlock()
+    {
+        if (pin == "1234")
+        {
+            AppState.Unlock();
+        }
+        else
+        {
+            error = "Incorrect PIN";
+        }
+    }
+}

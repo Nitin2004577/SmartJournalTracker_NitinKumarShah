@@ -15,9 +15,10 @@ namespace smart_journal
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddSingleton<Services.AppState>();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 
