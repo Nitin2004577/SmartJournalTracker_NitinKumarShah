@@ -1,0 +1,25 @@
+@page "/settings"
+@inject smart_journal.Services.AppState AppState
+
+<h1>Settings</h1>
+
+<div class="setting-item">
+    <label>Theme:</label>
+    <select @bind="SelectedTheme">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</div>
+
+<p>Current Theme: <strong>@(AppState.IsDarkMode ? "Dark" : "Light")</strong></p>
+
+@code {
+    private string SelectedTheme
+    {
+        get => AppState.IsDarkMode ? "dark" : "light";
+        set
+        {
+            AppState.IsDarkMode = value == "dark";
+        }
+    }
+}
