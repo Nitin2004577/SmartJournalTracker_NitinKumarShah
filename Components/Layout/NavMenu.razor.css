@@ -3,12 +3,13 @@
 .logo-container {
     font-size: 20px;
     font-weight: 600;
-    background-color:darkblue;
+    background-color: #032f3c;
     text-align: center;
-    padding-top:15px;
+    padding-top: 15px;
     padding-bottom: 30px;
     letter-spacing: 1px;
-    color: #e5e7eb;
+    color: powderblue;
+    box-shadow: inset;
 }
 
 /* Page List Wrapper */
@@ -27,6 +28,7 @@
 
     /* Individual Page Item */
     .pages-lists li {
+        color:black;
         padding: 12px 15px;
         margin-bottom: 8px;
         border-radius: 6px;
