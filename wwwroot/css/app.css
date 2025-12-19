@@ -100,7 +100,7 @@ h1:focus {
 
 /* Sidebar remains consistent */
 .sidebar {
-    background-color: slategray;
+    background-color: black;
 }
 
 /* Navbar remains consistent */
@@ -116,7 +116,7 @@ h1:focus {
 /* Optional: navbar styling */
 .navbar {
     padding: 10px;
-    background-color: #0078d7;
+    background-color: black;
     color: white;
 }
 

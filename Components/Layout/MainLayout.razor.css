@@ -11,20 +11,17 @@ main {
     flex: 1;
     padding: 2rem;
     transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: black; /* feature branch style */
 }
 
 /* Sidebar */
 .sidebar {
-<<<<<<< Updated upstream
-    background-color:slategray;
-=======
-    background-color: #10898d; /* Darker blue-gray */
+    background-color: #8897BD; /* feature branch color */
     color: #ffffff;
     padding: 1rem;
     display: flex;
     flex-direction: column;
     transition: background-color 0.3s ease;
->>>>>>> Stashed changes
 }
 
     .sidebar .logo-container {
@@ -87,7 +84,7 @@ main {
         .top-row ::deep a:hover,
         .top-row ::deep .btn-link:hover {
             text-decoration: underline;
-            color: black; /* blue hover */
+            color: black; /* hover color */
         }
 
 /* Responsive layout */
@@ -117,15 +114,13 @@ main {
         height: 100vh;
         position: sticky;
         top: 0;
-<<<<<<< Updated upstream
-=======
-        border-right: 1px solid #2C2F45;
+        border-right: 1px solid #2C2F45; /* main branch style */
     }
 
     main {
         flex: 1;
         padding: 2rem;
->>>>>>> Stashed changes
+        background-color: black; /* feature branch style */
     }
 
     .top-row {
