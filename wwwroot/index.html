@@ -32,31 +32,28 @@
     <script>
         var quill;
         window.initializeQuill = (content) => {
-            // Only initialize if it hasn't been already
-            if (!quill) {
-                quill = new Quill('#editor', {
-                    theme: 'snow',
-                    placeholder: 'Start writing...',
-                    modules: {
-                        toolbar: [
-                            [{ 'header': [1, 2, false] }],
-                            ['bold', 'italic', 'underline'],
-                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                            ['clean']
-                        ]
-                    }
-                });
-            }
+            const editorElement = document.getElementById('editor');
+            if (!editorElement) return;
+
+            // Reset the variable and the inner HTML to ensure a fresh start
+            editorElement.innerHTML = "";
+
+            quill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Start writing...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, false] }],
+                        ['bold', 'italic', 'underline'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean']
+                    ]
+                }
+            });
 
             if (content) {
                 quill.root.innerHTML = content;
-            } else {
-                quill.root.innerHTML = "";
             }
-        };
-
-        window.getQuillContent = () => {
-            return quill ? quill.root.innerHTML : "";
         };
     </script>
 

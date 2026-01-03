@@ -1,47 +1,51 @@
 ﻿@page "/settings"
 @inject smart_journal.Services.AppState AppState
 
-<div class="settings-container">
-    <div class="settings-header">
-        <h1>Settings</h1>
-        <p class="text-muted">Personalize your journal experience</p>
-    </div>
+<div class="settings-page-wrapper">
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1>Settings</h1>
+            <p class="text-muted">Personalize your journal experience</p>
+        </div>
 
-    <div class="settings-card">
-        <div class="setting-item">
-            <div class="setting-info">
-                <span class="setting-icon">🌓</span>
-                <div>
-                    <span class="setting-label">Display Theme</span>
-                    <p class="setting-description">Switch between light and dark modes</p>
+        <div class="settings-card">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-icon">🌓</div>
+                    <div class="setting-text-group">
+                        <span class="setting-label">Display Theme</span>
+                        <p class="setting-description">Switch between light and dark modes</p>
+                    </div>
+                </div>
+
+                <div class="setting-action">
+                    <select @bind="SelectedTheme" class="custom-select">
+                        <option value="light">☀️ Light Mode</option>
+                        <option value="dark">🌙 Dark Mode</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="theme-switch">
-                <select @bind="SelectedTheme" class="custom-select">
-                    <option value="light">☀️ Light Mode</option>
-                    <option value="dark">🌙 Dark Mode</option>
-                </select>
-            </div>
-        </div>
+            <div class="setting-divider"></div>
 
-        <div class="setting-divider"></div>
-
-        <div class="setting-item">
-            <div class="setting-info">
-                <span class="setting-icon">🔒</span>
-                <div>
-                    <span class="setting-label">Security</span>
-                    <p class="setting-description">Your PIN is currently active</p>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-icon">🔒</div>
+                    <div class="setting-text-group">
+                        <span class="setting-label">Security</span>
+                        <p class="setting-description">Your PIN is currently active</p>
+                    </div>
+                </div>
+                <div class="setting-action">
+                    <span class="status-badge">Locked</span>
                 </div>
             </div>
-            <span class="status-badge">Locked</span>
         </div>
-    </div>
 
-    <div class="app-info text-center mt-4">
-        <p>Current Theme: <strong>@(AppState.IsDarkMode ? "Dark" : "Light")</strong></p>
-        <small class="text-muted">SmartJournal v1.0.0</small>
+        <div class="app-info">
+            <p>Current Theme: <strong>@(AppState.IsDarkMode ? "Dark" : "Light")</strong></p>
+            <small>SmartJournal v1.0.0</small>
+        </div>
     </div>
 </div>
 

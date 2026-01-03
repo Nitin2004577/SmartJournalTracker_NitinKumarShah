@@ -13,14 +13,43 @@
     </div>
 
     <div class="section-card">
-        <label class="section-label">Primary Mood</label>
+        <label class="section-label">Primary Mood (Required)</label>
         <div class="mood-grid">
             @foreach (var m in AllMoods)
             {
                 <button type="button" class="mood-pill @(Entry.PrimaryMood == m.Name ? "active" : "")"
-                        @onclick="() => Entry.PrimaryMood = m.Name">
+                        @onclick="() => SetPrimaryMood(m)">
                     @m.Emoji @m.Name
                 </button>
+            }
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <label class="section-label">Selected Tags (@GetTagCount() / 4)</label>
+        </div>
+
+        <div class="tag-tray">
+            @foreach (var tag in GetTagList())
+            {
+                <span class="selected-tag">
+                    @tag
+                    <i class="tag-close" @onclick="() => RemoveTag(tag)">×</i>
+                </span>
+            }
+            @if (GetTagCount() < 4)
+            {
+                <input type="text" class="tag-inline-input" placeholder="Add tag..."
+                       @bind="newTagInput" @bind:event="oninput" @onkeyup="HandleTagKeyUp" />
+            }
+        </div>
+
+        <label class="section-label" style="margin-top: 15px; font-size: 0.7rem;">Suggestions</label>
+        <div class="tag-suggestions">
+            @foreach (var tag in Suggestions.Where(t => !IsTagSelected(t)).Take(8))
+            {
+                <button type="button" class="suggestion-pill" @onclick="() => AddTag(tag)">+ @tag</button>
             }
         </div>
     </div>
@@ -33,35 +62,67 @@
 @code {
     [Parameter] public string DateString { get; set; }
     private JournalEntry Entry = new();
-    private bool isInitialized = false;
+    private string newTagInput = "";
 
     private List<MoodItem> AllMoods = new() {
         new MoodItem("Happy", "😊", "Positive"),
         new MoodItem("Calm", "🌿", "Neutral"),
         new MoodItem("Sad", "😔", "Negative"),
-        new MoodItem("Angry", "😡", "Negative"),
-        new MoodItem("Excited", "🎉", "Positive")
+        new MoodItem("Angry", "😡", "Negative")
+    };
+
+    private List<string> Suggestions = new() {
+        "Work", "Career", "Studies", "Family", "Friends", "Health", "Fitness", "Personal Growth",
+        "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Exercise", "Music"
     };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !isInitialized)
+        if (firstRender)
         {
-            isInitialized = true;
             if (DateTime.TryParse(DateString, out var date))
             {
                 var existing = await Database.GetEntryByDateAsync(date.Date);
-                Entry = existing ?? new JournalEntry { Date = date.Date, Content = "" };
-
-                // Load Quill and pass existing content
+                Entry = existing ?? new JournalEntry { Date = date.Date, Content = "", Tags = "" };
                 await JS.InvokeVoidAsync("initializeQuill", Entry.Content);
             }
         }
     }
 
+    private void SetPrimaryMood(MoodItem m) => Entry.PrimaryMood = m.Name;
+
+    private void HandleTagKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" || e.Key == ",") AddTag(newTagInput);
+    }
+
+    private void AddTag(string tag)
+    {
+        var cleanTag = tag.Trim().Replace(",", "");
+        if (string.IsNullOrWhiteSpace(cleanTag) || GetTagCount() >= 4) return;
+
+        var tagList = GetTagList();
+        if (!tagList.Contains(cleanTag))
+        {
+            tagList.Add(cleanTag);
+            Entry.Tags = string.Join(",", tagList);
+        }
+        newTagInput = "";
+    }
+
+    private void RemoveTag(string tag)
+    {
+        var tagList = GetTagList();
+        tagList.Remove(tag);
+        Entry.Tags = string.Join(",", tagList);
+    }
+
+    private List<string> GetTagList() => string.IsNullOrEmpty(Entry.Tags) ? new List<string>() : Entry.Tags.Split(',').ToList();
+    private int GetTagCount() => GetTagList().Count;
+    private bool IsTagSelected(string tag) => GetTagList().Contains(tag);
+
     private async Task SaveEntry()
     {
-        // Ask JS for the content ONLY when saving
         Entry.Content = await JS.InvokeAsync<string>("getQuillContent");
         await Database.SaveEntryAsync(Entry);
         Nav.NavigateTo("/");
