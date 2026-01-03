@@ -35,7 +35,6 @@
             const editorElement = document.getElementById('editor');
             if (!editorElement) return;
 
-            // Reset the variable and the inner HTML to ensure a fresh start
             editorElement.innerHTML = "";
 
             quill = new Quill('#editor', {
@@ -54,6 +53,11 @@
             if (content) {
                 quill.root.innerHTML = content;
             }
+        };
+
+        // --- ADD THIS MISSING FUNCTION ---
+        window.getQuillContent = () => {
+            return quill ? quill.root.innerHTML : "";
         };
     </script>
 

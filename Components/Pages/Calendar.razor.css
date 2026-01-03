@@ -8,6 +8,52 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
+/* --- Status Banner --- */
+.status-banner {
+    background: #fff5f5;
+    border: 2px solid #feb2b2;
+    color: #c53030;
+    padding: 12px 16px;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideDown 0.3s ease-out forwards;
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.1);
+}
+
+.status-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-icon {
+    font-size: 1.2rem;
+}
+
+.status-banner p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.close-status {
+    background: rgba(197, 48, 48, 0.1);
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    color: #c53030;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Header & Nav --- */
 .calendar-header {
     display: flex;
     justify-content: space-between;
@@ -19,6 +65,7 @@
         color: var(--primary-green);
         font-weight: 800;
         margin: 0;
+        font-size: 1.5rem;
     }
 
 .nav-btn {
@@ -29,8 +76,15 @@
     height: 40px;
     border-radius: 12px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
+    .nav-btn:hover {
+        background: var(--accent-light);
+        color: var(--primary-green);
+    }
+
+/* --- Grid System --- */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -58,30 +112,75 @@
     color: var(--text-primary);
     transition: 0.2s;
     position: relative;
+    border: 2px solid transparent;
 }
 
-    .day-cell:hover {
+    .day-cell:hover:not(.future-date) {
         background: var(--accent-light);
     }
 
-    .day-cell.today {
-        border: 2px solid var(--primary-green);
+    /* --- State Styles --- */
+    .day-cell.future-date {
+        opacity: 0.3;
+        cursor: not-allowed !important;
+        pointer-events: none;
     }
+
+    .day-cell.today-done {
+        background-color: var(--primary-green) !important;
+        color: white !important;
+        font-weight: bold;
+    }
+
+    .day-cell.today-pending {
+        border: 2px solid var(--primary-green) !important;
+        color: var(--primary-green);
+        font-weight: 800;
+    }
+
+    .day-cell.missed-date {
+        background-color: rgba(229, 0, 0, 0.05);
+        color: #e50000;
+    }
+
+.missed-indicator {
+    font-size: 0.7rem;
+    color: #e50000;
+    font-weight: bold;
+    margin-top: -2px;
+}
 
 .entry-indicator {
     width: 6px;
     height: 6px;
-    background: var(--primary-green);
+    background-color: currentColor;
     border-radius: 50%;
-    position: absolute;
-    bottom: 6px;
+    margin-top: 2px;
 }
 
-.day-cell.has-entry {
+.day-cell.has-entry:not(.today-done) {
     background: var(--accent-light);
     color: var(--primary-green);
 }
 
 .empty {
     cursor: default;
+    pointer-events: none;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-15px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+.day-cell.has-entry:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }

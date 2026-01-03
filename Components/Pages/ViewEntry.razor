@@ -1,0 +1,103 @@
+﻿@page "/journal/view/{DateString}"
+@using smart_journal.Models
+@using smart_journal.Data
+@inject AppDatabase Database
+@inject NavigationManager Nav
+
+<div class="view-wrapper">
+    @if (Entry == null)
+    {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Gathering your thoughts...</p>
+        </div>
+    }
+    else
+    {
+        <div class="journal-card">
+            <header class="journal-header">
+                <button class="btn-icon" @onclick='() => Nav.NavigateTo("/calendar")'>
+                    <span>❮</span> Back
+                </button>
+
+                <div class="date-display">
+                    <span class="day-num">@Entry.Date.Day</span>
+                    <div class="month-year">
+                        <span class="month">@Entry.Date.ToString("MMMM")</span>
+                        <span class="year">@Entry.Date.Year</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-delete" @onclick="ConfirmDelete">
+                        Delete 🗑️
+                    </button>
+                    <button class="btn-edit" @onclick="GoToEdit">
+                        Edit ✍️
+                    </button>
+                </div>
+            </header>
+
+            <section class="journal-body">
+                <h1 class="entry-title">@Entry.Title</h1>
+
+                <div class="metadata-row">
+                    <span class="mood-pill">@Entry.PrimaryMood</span>
+
+                    @if (!string.IsNullOrEmpty(Entry.SecondaryMood1))
+                    {
+                        <span class="mood-pill secondary-view">@Entry.SecondaryMood1</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Entry.SecondaryMood2))
+                    {
+                        <span class="mood-pill secondary-view">@Entry.SecondaryMood2</span>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Entry.Tags))
+                    {
+                        @foreach (var tag in Entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <span class="tag-pill">#@tag.Trim()</span>
+                        }
+                    }
+                </div>
+
+                <div class="content-area">
+                    @((MarkupString)Entry.Content)
+                </div>
+            </section>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string DateString { get; set; }
+    private JournalEntry Entry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allEntries = await Database.GetEntriesAsync();
+        // Match the entry by date string
+        Entry = allEntries.FirstOrDefault(e => e.Date.ToString("yyyy-MM-dd") == DateString);
+    }
+
+    private void GoToEdit()
+    {
+        Nav.NavigateTo($"/journal/edit/{DateString}");
+    }
+    private async Task ConfirmDelete()
+    {
+        // Using MAUI's native Alert with a "Destructive" feel
+        bool confirm = await Application.Current.MainPage.DisplayAlert(
+            "Delete Entry?",
+            "This action cannot be undone. Are you sure you want to delete this memory?",
+            "Delete",
+            "Cancel");
+
+        if (confirm)
+        {
+            await Database.DeleteEntryAsync(Entry);
+            Nav.NavigateTo("/calendar");
+        }
+    }
+}

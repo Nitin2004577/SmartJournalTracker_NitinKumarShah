@@ -1,6 +1,7 @@
 ﻿@page "/calendar"
 @using smart_journal.Models
 @using smart_journal.Data
+@using Microsoft.Maui.Controls @* Required for DisplayAlert *@
 @inject AppDatabase Database
 @inject NavigationManager Nav
 
@@ -12,9 +13,9 @@
     </div>
 
     <div class="calendar-grid">
-        @foreach (var day in DayNames)
+        @foreach (var dayName in DayNames)
         {
-            <div class="day-name">@day</div>
+            <div class="day-name">@dayName</div>
         }
 
         @for (int i = 0; i < Offset; i++)
@@ -27,13 +28,25 @@
             var day = d;
             var date = new DateTime(CurrentYear, CurrentMonth, day);
             var hasEntry = EntryDates.Contains(date.Date);
+            var isFuture = date.Date > DateTime.Today;
+            var isPast = date.Date < DateTime.Today;
+            var isToday = date.Date == DateTime.Today;
 
-            <div class="day-cell @(date == DateTime.Today ? "today" : "") @(hasEntry ? "has-entry" : "")"
-                 @onclick="() => GoToDate(date)">
+            var statusClass = isFuture ? "future-date"
+            : (isToday && hasEntry) ? "today-done"
+            : (isToday && !hasEntry) ? "today-pending"
+            : (isPast && !hasEntry) ? "missed-date"
+            : hasEntry ? "has-entry" : "";
+
+            <div class="day-cell @statusClass" @onclick="() => HandleDateClick(date, isFuture, hasEntry, isPast)">
                 <span class="day-number">@day</span>
                 @if (hasEntry)
                 {
                     <div class="entry-indicator"></div>
+                }
+                else if (isPast && !isFuture)
+                {
+                    <div class="missed-indicator">!</div>
                 }
             </div>
         }
@@ -58,16 +71,35 @@
 
     private async Task LoadEntryDates()
     {
-        // Fetch all dates that have entries to show indicators
         var entries = await Database.GetEntriesAsync();
         EntryDates = entries.Select(e => e.Date.Date).ToList();
     }
 
+    private async Task HandleDateClick(DateTime date, bool isFuture, bool hasEntry, bool isPast)
+    {
+        if (isFuture) return;
+
+        if (hasEntry)
+        {
+            Nav.NavigateTo($"/journal/view/{date:yyyy-MM-dd}");
+        }
+        else if (isPast)
+        {
+            // Native MAUI System Dialog
+            if (Application.Current?.MainPage != null)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Missed Entry",
+                    $"There is no journal recorded for {date:MMM dd, yyyy}.",
+                    "OK");
+            }
+        }
+        else
+        {
+            Nav.NavigateTo($"/journal/edit/{date:yyyy-MM-dd}");
+        }
+    }
+
     private void NextMonth() => DisplayDate = DisplayDate.AddMonths(1);
     private void PrevMonth() => DisplayDate = DisplayDate.AddMonths(-1);
-
-    private void GoToDate(DateTime date)
-    {
-        Nav.NavigateTo($"/journal/edit/{date.ToString("yyyy-MM-dd")}");
-    }
 }

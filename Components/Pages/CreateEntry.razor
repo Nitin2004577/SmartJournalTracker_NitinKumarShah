@@ -1,6 +1,7 @@
 ﻿@page "/journal/edit/{DateString}"
 @using smart_journal.Models
 @using smart_journal.Data
+@using Microsoft.Maui.Controls
 @inject AppDatabase Database
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -12,10 +13,11 @@
         <button type="button" class="btn-save" @onclick="SaveEntry">Save Entry</button>
     </div>
 
+    @* --- PRIMARY MOOD --- *@
     <div class="section-card">
         <label class="section-label">Primary Mood (Required)</label>
         <div class="mood-grid">
-            @foreach (var m in AllMoods)
+            @foreach (var m in PrimaryMoodOptions)
             {
                 <button type="button" class="mood-pill @(Entry.PrimaryMood == m.Name ? "active" : "")"
                         @onclick="() => SetPrimaryMood(m)">
@@ -25,11 +27,24 @@
         </div>
     </div>
 
+    @* --- SECONDARY MOODS --- *@
     <div class="section-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <label class="section-label">Selected Tags (@GetTagCount() / 4)</label>
+        <label class="section-label">Secondary Feelings (Max 2)</label>
+        <div class="mood-grid secondary">
+            @foreach (var m in SecondaryMoodOptions)
+            {
+                bool isSelected = IsSecondarySelected(m.Name);
+                <button type="button" class="mood-pill secondary @(isSelected ? "active-secondary" : "")"
+                        @onclick="() => ToggleSecondaryMood(m.Name)">
+                    @m.Emoji @m.Name
+                </button>
+            }
         </div>
+    </div>
 
+    @* --- TAGS --- *@
+    <div class="section-card">
+        <label class="section-label">Selected Tags (@GetTagCount() / 4)</label>
         <div class="tag-tray">
             @foreach (var tag in GetTagList())
             {
@@ -54,6 +69,7 @@
         </div>
     </div>
 
+    @* --- EDITOR --- *@
     <div class="editor-wrapper" @key=' "quill-editor-parent" '>
         <div id="editor"></div>
     </div>
@@ -64,16 +80,24 @@
     private JournalEntry Entry = new();
     private string newTagInput = "";
 
-    private List<MoodItem> AllMoods = new() {
+    private List<MoodItem> PrimaryMoodOptions = new() {
         new MoodItem("Happy", "😊", "Positive"),
         new MoodItem("Calm", "🌿", "Neutral"),
         new MoodItem("Sad", "😔", "Negative"),
         new MoodItem("Angry", "😡", "Negative")
     };
 
+    private List<MoodItem> SecondaryMoodOptions = new() {
+        new MoodItem("Anxious", "😟", "Negative"),
+        new MoodItem("Grateful", "🙏", "Positive"),
+        new MoodItem("Tired", "😴", "Neutral"),
+        new MoodItem("Excited", "✨", "Positive"),
+        new MoodItem("Lonely", "☁️", "Negative"),
+        new MoodItem("Productive", "💪", "Positive")
+    };
+
     private List<string> Suggestions = new() {
-        "Work", "Career", "Studies", "Family", "Friends", "Health", "Fitness", "Personal Growth",
-        "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Exercise", "Music"
+        "Work", "Family", "Health", "Hobbies", "Travel", "Self-care", "Exercise", "Music"
     };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -83,24 +107,53 @@
             if (DateTime.TryParse(DateString, out var date))
             {
                 var existing = await Database.GetEntryByDateAsync(date.Date);
+
+                // 1. Set the entry
                 Entry = existing ?? new JournalEntry { Date = date.Date, Content = "", Tags = "" };
+
+                // 2. Load the Quill Editor content
                 await JS.InvokeVoidAsync("initializeQuill", Entry.Content);
+
+                // 3. MANDATORY: Tell Blazor to refresh the UI with the loaded data!
+                StateHasChanged();
             }
         }
     }
 
-    private void SetPrimaryMood(MoodItem m) => Entry.PrimaryMood = m.Name;
-
-    private void HandleTagKeyUp(KeyboardEventArgs e)
+    private void SetPrimaryMood(MoodItem m)
     {
-        if (e.Key == "Enter" || e.Key == ",") AddTag(newTagInput);
+        Entry.PrimaryMood = m.Name;
+        Entry.MoodCategory = m.Category; // Automatically sets Positive/Negative based on Model
     }
+
+    // Logic to handle SecondaryMood1 and SecondaryMood2 fields in your Model
+    private void ToggleSecondaryMood(string moodName)
+    {
+        if (Entry.SecondaryMood1 == moodName)
+        {
+            Entry.SecondaryMood1 = Entry.SecondaryMood2; // Shift slot 2 to slot 1
+            Entry.SecondaryMood2 = null;
+        }
+        else if (Entry.SecondaryMood2 == moodName)
+        {
+            Entry.SecondaryMood2 = null;
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(Entry.SecondaryMood1)) Entry.SecondaryMood1 = moodName;
+            else if (string.IsNullOrEmpty(Entry.SecondaryMood2)) Entry.SecondaryMood2 = moodName;
+        }
+    }
+
+    private bool IsSecondarySelected(string name) =>
+        Entry.SecondaryMood1 == name || Entry.SecondaryMood2 == name;
+
+    private void HandleTagKeyUp(KeyboardEventArgs e) { if (e.Key == "Enter" || e.Key == ",") AddTag(newTagInput); }
 
     private void AddTag(string tag)
     {
         var cleanTag = tag.Trim().Replace(",", "");
         if (string.IsNullOrWhiteSpace(cleanTag) || GetTagCount() >= 4) return;
-
         var tagList = GetTagList();
         if (!tagList.Contains(cleanTag))
         {
@@ -123,11 +176,20 @@
 
     private async Task SaveEntry()
     {
+        if (string.IsNullOrEmpty(Entry.PrimaryMood))
+        {
+            if (Application.Current?.MainPage != null)
+                await Application.Current.MainPage.DisplayAlert("Required", "Please select a Primary Mood.", "OK");
+            return;
+        }
+
         Entry.Content = await JS.InvokeAsync<string>("getQuillContent");
+        Entry.LastUpdated = DateTime.Now;
+
         await Database.SaveEntryAsync(Entry);
-        Nav.NavigateTo("/");
+        Nav.NavigateTo("/calendar");
     }
 
-    private void GoBack() => Nav.NavigateTo("/");
+    private void GoBack() => Nav.NavigateTo("/calendar");
     public record MoodItem(string Name, string Emoji, string Category);
 }

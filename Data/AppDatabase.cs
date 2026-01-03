@@ -68,5 +68,10 @@ namespace smart_journal.Data
             // This fetches all entries from the table and returns them as a list
             return await _db.Table<JournalEntry>().ToListAsync();
         }
+
+        public async Task<int> DeleteEntryAsync(JournalEntry entry)
+        {
+            return await _db.DeleteAsync(entry);
+        }
     }
 }

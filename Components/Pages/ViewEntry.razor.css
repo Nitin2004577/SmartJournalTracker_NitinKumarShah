@@ -1,0 +1,174 @@
+.view-wrapper {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.journal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    padding: 3rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+    min-height: 70vh;
+}
+
+.journal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+/* Date Display */
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.day-num {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--primary-green);
+    line-height: 1;
+}
+
+.month-year {
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.month {
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.entry-title {
+    font-size: 2.8rem;
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.metadata-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* MOOD STYLING - Differentiation */
+.mood-pill {
+    background: var(--primary-green);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(var(--primary-green-rgb), 0.2);
+}
+
+/* Secondary Mood Style: Subtle & Outlined */
+.secondary-view {
+    background: transparent !important;
+    border: 1.5px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.tag-pill {
+    background: var(--accent-light);
+    color: var(--primary-green);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+}
+
+/* Dark Mode Fixed Content Area */
+.content-area {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-primary); /* Changed from #333 to Variable */
+    padding-top: 1rem;
+}
+
+/* Ensures HTML content from Quill also flips color */
+::deep .content-area p,
+::deep .content-area span,
+::deep .content-area li {
+    color: var(--text-primary) !important;
+}
+
+.btn-icon, .btn-edit {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+    .btn-edit:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-delete {
+    background: transparent;
+    color: #ff4d4d; /* Bright Red */
+    border: 1px solid #ff4d4d;
+    padding: 10px 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-delete:hover {
+        background: #ff4d4d;
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+    }
+
+/* Ensure buttons look good on mobile */
+@media (max-width: 600px) {
+    .journal-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .action-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+}
