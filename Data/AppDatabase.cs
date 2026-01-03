@@ -1,28 +1,64 @@
 ﻿using SQLite;
-using smart_journal.Models;  // your AppSettings model
+using smart_journal.Models;
 
 namespace smart_journal.Data
 {
     public class AppDatabase
     {
-        private readonly SQLiteAsyncConnection _database;
+        private SQLiteAsyncConnection _db;
 
-        public AppDatabase(string dbPath)
+        // The "Init" method ensures the database exists before we use it
+        private async Task Init()
         {
-            _database = new SQLiteAsyncConnection(dbPath);
-            _database.CreateTableAsync<AppSettings>().Wait();
+            if (_db is not null) return;
+
+            // This sets the path to the internal hidden folder of the app
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "journal_v3.db3");
+
+            _db = new SQLiteAsyncConnection(dbPath);
+
+            // This creates the table if it doesn't exist
+            await _db.CreateTableAsync<JournalEntry>();
         }
 
-        // Get the single app settings row
-        public async Task<AppSettings> GetSettingsAsync()
+        // 1. CREATE / UPDATE
+        public async Task SaveEntryAsync(JournalEntry entry)
         {
-            return await _database.Table<AppSettings>().FirstOrDefaultAsync();
+            await Init();
+            if (entry.Id != 0)
+                await _db.UpdateAsync(entry);
+            else
+                await _db.InsertAsync(entry);
         }
 
-        // Save or update the app settings
-        public async Task SaveSettingsAsync(AppSettings settings)
+        // 2. READ (Single Entry)
+        public async Task<JournalEntry> GetEntryByDateAsync(DateTime date)
         {
-            await _database.InsertOrReplaceAsync(settings);
+            await Init();
+
+            // Calculate the start and end of the target day
+            var startOfDay = date.Date;
+            var endOfDay = date.Date.AddDays(1);
+
+            // Use simple comparisons that SQLite-net can easily translate to SQL
+            return await _db.Table<JournalEntry>()
+                            .FirstOrDefaultAsync(x => x.Date >= startOfDay && x.Date < endOfDay);
+        }
+
+        // 3. READ (All Entries)
+        public async Task<List<JournalEntry>> GetAllEntriesAsync()
+        {
+            await Init();
+            return await _db.Table<JournalEntry>().OrderByDescending(x => x.Date).ToListAsync();
+        }
+
+        // 4. DELETE
+        public async Task DeleteEntryAsync(DateTime date)
+        {
+            await Init();
+            var entry = await GetEntryByDateAsync(date);
+            if (entry != null)
+                await _db.DeleteAsync(entry);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using smart_journal.Data;
 
 namespace smart_journal
 {
@@ -15,6 +16,8 @@ namespace smart_journal
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            // Register the database as a Singleton (one instance for the whole app)
+            builder.Services.AddSingleton<AppDatabase>();
             builder.Services.AddSingleton<Services.AppState>();
 
 #if DEBUG

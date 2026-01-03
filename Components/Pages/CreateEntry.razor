@@ -1,0 +1,71 @@
+﻿@page "/journal/edit/{DateString}"
+@using smart_journal.Models
+@using smart_journal.Data
+@inject AppDatabase Database
+@inject NavigationManager Nav
+
+<div class="entry-container">
+    <div class="entry-header">
+        <button class="btn-back" @onclick="GoBack">←</button>
+        <input type="text" @bind="Entry.Title" placeholder="Entry Title..." class="title-input" />
+        <button class="btn-save" @onclick="SaveEntry">Save</button>
+    </div>
+
+    <div class="mood-selector">
+        <p>How are you feeling?</p>
+        <div class="mood-options">
+            @foreach (var mood in Moods)
+            {
+                <button class="mood-btn @(Entry.Mood == mood ? "selected" : "")"
+                        @onclick="() => SelectMood(mood)">
+                    @GetMoodEmoji(mood)
+                </button>
+            }
+        </div>
+    </div>
+
+    <textarea @bind="Entry.Content" placeholder="Write your thoughts here..." class="content-area"></textarea>
+</div>
+
+@code {
+    [Parameter] public string DateString { get; set; }
+    private JournalEntry Entry = new();
+    private readonly string[] Moods = { "Happy", "Neutral", "Sad", "Angry", "Calm" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DateTime.TryParse(DateString, out var date))
+        {
+            var existing = await Database.GetEntryByDateAsync(date);
+            if (existing != null)
+            {
+                Entry = existing;
+            }
+            else
+            {
+                Entry.Date = date;
+            }
+        }
+    }
+
+    private void SelectMood(string mood) => Entry.Mood = mood;
+
+    private async Task SaveEntry()
+    {
+        Entry.LastUpdated = DateTime.Now;
+        await Database.SaveEntryAsync(Entry);
+        Nav.NavigateTo("/"); // Go back to dashboard after saving
+    }
+
+    private void GoBack() => Nav.NavigateTo("/");
+
+    private string GetMoodEmoji(string mood) => mood switch
+    {
+        "Happy" => "😊",
+        "Neutral" => "😐",
+        "Sad" => "😢",
+        "Angry" => "😡",
+        "Calm" => "🌿",
+        _ => "😶"
+    };
+}

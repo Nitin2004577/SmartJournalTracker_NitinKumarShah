@@ -1,36 +1,38 @@
-<div>
-    @* Logo or name *@
-    <div class="logo-container">smartjournal</div>
+﻿<div class="sidebar-wrapper">
+    @* Logo Section *@
+    <div class="logo-container">
+        <span class="logo-icon">🌿</span> smartjournal
+    </div>
 
-    @* Pages *@
-<div class="page-list-container">
-    <ul class="pages-lists">
-            <div class="nav-item px-3">
+    @* Navigation Links *@
+    <div class="page-list-container">
+        <ul class="pages-lists">
+            <li class="nav-item">
                 <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Dashboard
-                </NavLink>
-            </div>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="/calender" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Calender
+                    <span class="nav-icon">🏠</span> Dashboard
                 </NavLink>
             </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="/create" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Create
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/calendar">
+                    <span class="nav-icon">📅</span> Calendar
                 </NavLink>
             </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="/analytics" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Analytics
+            <li class="nav-item">
+                @* Links to Today's Entry specifically *@
+                <NavLink class="nav-link" href="@($"/journal/edit/{DateTime.Now:yyyy-MM-dd}")">
+                    <span class="nav-icon">✍️</span> Create
                 </NavLink>
             </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="/settings" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Settings
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/analytics">
+                    <span class="nav-icon">📊</span> Analytics
                 </NavLink>
             </li>
-    </ul>
-</div>
- 
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/settings">
+                    <span class="nav-icon">⚙️</span> Settings
+                </NavLink>
+            </li>
+        </ul>
+    </div>
 </div>

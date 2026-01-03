@@ -1,78 +1,63 @@
+/* 1. Base Layout Setup */
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    /* Uses variables from app.css */
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 main {
     flex: 1;
-}
-
-.sidebar {
-    background-color: #8897BD;
-}
-
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    background-color: var(--bg-main);
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
-
-        .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-            text-decoration: underline;
-        }
-
-        .top-row ::deep a:first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-        .top-row ::deep a, .top-row ::deep .btn-link {
-            margin-left: 0;
-        }
+/* 2. The Sidebar Container */
+.sidebar {
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    transition: all 0.4s ease;
+    z-index: 10;
 }
 
+/* 3. The Content Area */
+article.content {
+    flex: 1;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    /* Ensure text inside articles follows the theme */
+    color: var(--text-primary);
+}
+
+/* 4. Responsive Design (Desktop vs Mobile) */
 @media (min-width: 641px) {
     .page {
-        flex-direction: row;
+        flex-direction: row; /* Sidebar on the left */
     }
 
     .sidebar {
-        width: 250px;
+        width: 280px;
         height: 100vh;
         position: sticky;
         top: 0;
-        background-color: black;
     }
+}
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
+@media (max-width: 640.98px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
     }
+}
 
-        .top-row.auth ::deep a:first-child {
-            flex: 1;
-            text-align: right;
-            width: 0;
-        }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+/* Hide the default Blazor top row */
+.top-row {
+    display: none;
 }

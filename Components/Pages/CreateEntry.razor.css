@@ -1,0 +1,75 @@
+.entry-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 85vh;
+}
+
+.entry-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.title-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border-color);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    padding: 10px 0;
+    outline: none;
+}
+
+.btn-save {
+    background-color: var(--primary-green);
+    color: var(--bg-main);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mood-selector {
+    margin-bottom: 20px;
+}
+
+.mood-options {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.mood-btn {
+    font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .mood-btn.selected {
+        border-color: var(--primary-green);
+        background: var(--accent-light);
+        transform: scale(1.1);
+    }
+
+.content-area {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 20px;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+}

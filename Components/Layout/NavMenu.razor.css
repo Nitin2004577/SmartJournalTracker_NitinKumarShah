@@ -1,47 +1,56 @@
+/* Sidebar Main Container */
+.sidebar-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    transition: all 0.4s ease;
+}
 
-/* Logo / App Name */
+/* Logo Section */
 .logo-container {
-    font-size: 20px;
-    font-weight: 600;
-    background-color:darkblue;
+    font-size: 22px;
+    font-weight: 800;
     text-align: center;
-    padding-top:15px;
-    padding-bottom: 30px;
-    letter-spacing: 1px;
-    color: #e5e7eb;
+    padding: 2.5rem 1rem;
+    /* Uses the "Green more green" in dark mode automatically */
+    color: var(--primary-green);
+    background-color: var(--bg-card);
+    transition: all 0.4s ease;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Page List Wrapper */
-.page-list-container {
-    flex-grow: 1;
+/* NavLinks Base Style */
+::deep .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    margin: 6px 14px;
+    border-radius: 14px;
+    color: var(--text-muted) !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-/* Page List */
-.pages-lists {
-    
-    font-weight:bold;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-    /* Individual Page Item */
-    .pages-lists li {
-        padding: 12px 15px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-        transition: background-color 0.2s ease;
+    /* Hover State */
+    ::deep .nav-link:hover {
+        background-color: var(--accent-light);
+        color: var(--primary-green) !important;
+        transform: translateX(5px);
     }
 
-        /* Hover Effect */
-        .pages-lists li:hover {
-            background-color: lightgray;
-        }
+    /* Active State (The page you are currently on) */
+    ::deep .nav-link.active {
+        background-color: var(--primary-green) !important;
+        color: var(--bg-main) !important; /* High contrast: Dark text on bright background in dark mode */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        font-weight: 700;
+    }
 
-        /* Active Page (optional) */
-        .pages-lists li.active {
-            background-color: #2563eb;
-            font-weight: 500;
-        }
+/* Icon Spacing */
+.nav-icon {
+    margin-right: 12px;
+    font-size: 1.2rem;
+}

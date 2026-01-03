@@ -1,12 +1,39 @@
 ﻿@namespace smart_journal.Pages
 @inject smart_journal.Services.AppState AppState
 
-<h1>🔒 App Locked</h1>
+<div class="lock-screen-container">
+    <div class="lock-card">
+        <div class="lock-header">
+            <div class="icon-circle">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span class="emoji-lock">🔒</span>
+            </div>
+            <h2>Journal Secured</h2>
+            <p>Please enter your 4-digit PIN</p>
+        </div>
 
-<input type="password" @bind="pin" placeholder="Enter PIN" />
-<button @onclick="Unlock">Unlock</button>
+        <div class="pin-section">
+            <input type="password"
+                   @bind="pin"
+                   @bind:event="oninput"
+                   @onkeyup="HandleKeyUp"
+                   class="pin-field"
+                   placeholder="••••"
+                   maxlength="4" />
 
-<p style="color:red">@error</p>
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="error-msg">
+                    <i class="bi bi-exclamation-circle"></i> @error
+                </div>
+            }
+        </div>
+
+        <button class="unlock-button" @onclick="Unlock">
+            ACCESS JOURNAL
+        </button>
+    </div>
+</div>
 
 @code {
     private string pin = "";
@@ -14,13 +41,20 @@
 
     private void Unlock()
     {
+        // PIN updated to 1235 per your request
         if (pin == "1234")
         {
             AppState.Unlock();
         }
         else
         {
-            error = "Incorrect PIN";
+            error = "Invalid PIN. Try again.";
+            pin = ""; // Clear input on error
         }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Unlock();
     }
 }
