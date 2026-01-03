@@ -1,0 +1,73 @@
+﻿@page "/calendar"
+@using smart_journal.Models
+@using smart_journal.Data
+@inject AppDatabase Database
+@inject NavigationManager Nav
+
+<div class="calendar-wrapper">
+    <div class="calendar-header">
+        <button class="nav-btn" @onclick="PrevMonth">❮</button>
+        <h2>@CurrentMonthName @CurrentYear</h2>
+        <button class="nav-btn" @onclick="NextMonth">❯</button>
+    </div>
+
+    <div class="calendar-grid">
+        @foreach (var day in DayNames)
+        {
+            <div class="day-name">@day</div>
+        }
+
+        @for (int i = 0; i < Offset; i++)
+        {
+            <div class="day-cell empty"></div>
+        }
+
+        @for (int d = 1; d <= DaysInMonth; d++)
+        {
+            var day = d;
+            var date = new DateTime(CurrentYear, CurrentMonth, day);
+            var hasEntry = EntryDates.Contains(date.Date);
+
+            <div class="day-cell @(date == DateTime.Today ? "today" : "") @(hasEntry ? "has-entry" : "")"
+                 @onclick="() => GoToDate(date)">
+                <span class="day-number">@day</span>
+                @if (hasEntry)
+                {
+                    <div class="entry-indicator"></div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime DisplayDate = DateTime.Today;
+    private List<DateTime> EntryDates = new();
+
+    private int CurrentMonth => DisplayDate.Month;
+    private int CurrentYear => DisplayDate.Year;
+    private string CurrentMonthName => DisplayDate.ToString("MMMM");
+    private int DaysInMonth => DateTime.DaysInMonth(CurrentYear, CurrentMonth);
+    private int Offset => (int)new DateTime(CurrentYear, CurrentMonth, 1).DayOfWeek;
+    private string[] DayNames = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEntryDates();
+    }
+
+    private async Task LoadEntryDates()
+    {
+        // Fetch all dates that have entries to show indicators
+        var entries = await Database.GetEntriesAsync();
+        EntryDates = entries.Select(e => e.Date.Date).ToList();
+    }
+
+    private void NextMonth() => DisplayDate = DisplayDate.AddMonths(1);
+    private void PrevMonth() => DisplayDate = DisplayDate.AddMonths(-1);
+
+    private void GoToDate(DateTime date)
+    {
+        Nav.NavigateTo($"/journal/edit/{date.ToString("yyyy-MM-dd")}");
+    }
+}

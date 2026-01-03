@@ -60,5 +60,13 @@ namespace smart_journal.Data
             if (entry != null)
                 await _db.DeleteAsync(entry);
         }
+
+        // Add this method to your AppDatabase class
+        public async Task<List<JournalEntry>> GetEntriesAsync()
+        {
+            await Init();
+            // This fetches all entries from the table and returns them as a list
+            return await _db.Table<JournalEntry>().ToListAsync();
+        }
     }
 }

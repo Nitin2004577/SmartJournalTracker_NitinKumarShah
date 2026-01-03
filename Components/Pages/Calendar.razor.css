@@ -1,0 +1,87 @@
+.calendar-wrapper {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+    .calendar-header h2 {
+        color: var(--primary-green);
+        font-weight: 800;
+        margin: 0;
+    }
+
+.nav-btn {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.day-name {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding-bottom: 10px;
+}
+
+.day-cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: 0.2s;
+    position: relative;
+}
+
+    .day-cell:hover {
+        background: var(--accent-light);
+    }
+
+    .day-cell.today {
+        border: 2px solid var(--primary-green);
+    }
+
+.entry-indicator {
+    width: 6px;
+    height: 6px;
+    background: var(--primary-green);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 6px;
+}
+
+.day-cell.has-entry {
+    background: var(--accent-light);
+    color: var(--primary-green);
+}
+
+.empty {
+    cursor: default;
+}
