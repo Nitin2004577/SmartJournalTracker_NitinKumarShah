@@ -3,69 +3,70 @@
 @using smart_journal.Data
 @inject AppDatabase Database
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="entry-container">
     <div class="entry-header">
-        <button class="btn-back" @onclick="GoBack">←</button>
+        <button type="button" class="btn-back" @onclick="GoBack">←</button>
         <input type="text" @bind="Entry.Title" placeholder="Entry Title..." class="title-input" />
-        <button class="btn-save" @onclick="SaveEntry">Save</button>
+        <button type="button" class="btn-save" @onclick="SaveEntry">Save Entry</button>
     </div>
 
-    <div class="mood-selector">
-        <p>How are you feeling?</p>
-        <div class="mood-options">
-            @foreach (var mood in Moods)
+    <div class="section-card">
+        <label class="section-label">Primary Mood</label>
+        <div class="mood-grid">
+            @foreach (var m in AllMoods)
             {
-                <button class="mood-btn @(Entry.Mood == mood ? "selected" : "")"
-                        @onclick="() => SelectMood(mood)">
-                    @GetMoodEmoji(mood)
+                <button type="button" class="mood-pill @(Entry.PrimaryMood == m.Name ? "active" : "")"
+                        @onclick="() => Entry.PrimaryMood = m.Name">
+                    @m.Emoji @m.Name
                 </button>
             }
         </div>
     </div>
 
-    <textarea @bind="Entry.Content" placeholder="Write your thoughts here..." class="content-area"></textarea>
+    <div class="editor-wrapper" @key=' "quill-editor-parent" '>
+        <div id="editor"></div>
+    </div>
 </div>
 
 @code {
     [Parameter] public string DateString { get; set; }
     private JournalEntry Entry = new();
-    private readonly string[] Moods = { "Happy", "Neutral", "Sad", "Angry", "Calm" };
+    private bool isInitialized = false;
 
-    protected override async Task OnInitializedAsync()
+    private List<MoodItem> AllMoods = new() {
+        new MoodItem("Happy", "😊", "Positive"),
+        new MoodItem("Calm", "🌿", "Neutral"),
+        new MoodItem("Sad", "😔", "Negative"),
+        new MoodItem("Angry", "😡", "Negative"),
+        new MoodItem("Excited", "🎉", "Positive")
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (DateTime.TryParse(DateString, out var date))
+        if (firstRender && !isInitialized)
         {
-            var existing = await Database.GetEntryByDateAsync(date);
-            if (existing != null)
+            isInitialized = true;
+            if (DateTime.TryParse(DateString, out var date))
             {
-                Entry = existing;
-            }
-            else
-            {
-                Entry.Date = date;
+                var existing = await Database.GetEntryByDateAsync(date.Date);
+                Entry = existing ?? new JournalEntry { Date = date.Date, Content = "" };
+
+                // Load Quill and pass existing content
+                await JS.InvokeVoidAsync("initializeQuill", Entry.Content);
             }
         }
     }
 
-    private void SelectMood(string mood) => Entry.Mood = mood;
-
     private async Task SaveEntry()
     {
-        Entry.LastUpdated = DateTime.Now;
+        // Ask JS for the content ONLY when saving
+        Entry.Content = await JS.InvokeAsync<string>("getQuillContent");
         await Database.SaveEntryAsync(Entry);
-        Nav.NavigateTo("/"); // Go back to dashboard after saving
+        Nav.NavigateTo("/");
     }
 
     private void GoBack() => Nav.NavigateTo("/");
-
-    private string GetMoodEmoji(string mood) => mood switch
-    {
-        "Happy" => "😊",
-        "Neutral" => "😐",
-        "Sad" => "😢",
-        "Angry" => "😡",
-        "Calm" => "🌿",
-        _ => "😶"
-    };
+    public record MoodItem(string Name, string Emoji, string Category);
 }

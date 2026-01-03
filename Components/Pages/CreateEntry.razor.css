@@ -1,16 +1,15 @@
+/* 1. Main Layout Containers */
 .entry-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    height: 85vh;
+    padding: 20px;
 }
 
 .entry-header {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .title-input {
@@ -25,51 +24,173 @@
     outline: none;
 }
 
-.btn-save {
-    background-color: var(--primary-green);
-    color: var(--bg-main);
-    border: none;
-    padding: 10px 25px;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.mood-selector {
+/* 2. Mood & Category Cards */
+.section-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
     margin-bottom: 20px;
 }
 
-.mood-options {
+.section-label {
+    display: block;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.mood-grid {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
+}
+
+.mood-pill {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 99px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .mood-pill.active {
+        background: var(--primary-green);
+        color: var(--bg-main);
+        border-color: var(--primary-green);
+        transform: scale(1.05);
+    }
+
+/* 3. THE QUILL EDITOR (Premium Overrides) */
+.editor-wrapper {
+    background: var(--bg-card);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Force Quill Toolbar to use your theme */
+::deep .ql-toolbar.ql-snow {
+    background: var(--bg-sidebar) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 12px !important;
+}
+
+/* Default Toolbar Icon Colors */
+::deep .ql-snow .ql-stroke {
+    stroke: var(--text-primary) !important;
+}
+
+::deep .ql-snow .ql-fill {
+    fill: var(--text-primary) !important;
+}
+
+::deep .ql-snow .ql-picker {
+    color: var(--text-primary) !important;
+}
+
+/* --- MS WORD STYLE ACTIVE STATES --- */
+::deep .ql-snow.ql-toolbar button.ql-active,
+::deep .ql-snow .ql-toolbar button.ql-active,
+::deep .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+::deep .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+    color: var(--primary-green) !important;
+    background-color: var(--accent-light) !important;
+    border-radius: 4px;
+}
+
+    ::deep .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+    ::deep .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+        stroke: var(--primary-green) !important;
+        stroke-width: 3px;
+    }
+
+    ::deep .ql-snow.ql-toolbar button.ql-active .ql-fill,
+    ::deep .ql-snow .ql-toolbar button.ql-active .ql-fill {
+        fill: var(--primary-green) !important;
+    }
+
+/* Hover effect */
+::deep .ql-toolbar.ql-snow button:hover {
+    color: var(--primary-green) !important;
+    background-color: var(--accent-light) !important;
+}
+
+    ::deep .ql-toolbar.ql-snow button:hover .ql-stroke {
+        stroke: var(--primary-green) !important;
+    }
+
+/* Text Area Theme */
+::deep .ql-container.ql-snow {
+    border: none !important;
+    min-height: 400px;
+    font-family: inherit;
+}
+
+::deep .ql-editor {
+    color: var(--text-primary) !important;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    padding: 25px !important;
+}
+
+    ::deep .ql-editor.ql-blank::before {
+        color: var(--text-muted) !important;
+        font-style: normal;
+    }
+
+/* 4. Tags & Secondary Moods Support */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 10px;
 }
 
-.mood-btn {
-    font-size: 1.5rem;
-    padding: 10px;
-    border-radius: 12px;
-    border: 2px solid var(--border-color);
-    background: var(--bg-card);
+.tag-pill {
+    background: var(--accent-light);
+    color: var(--primary-green);
+    border: 1px solid var(--border-color);
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* 5. Utility Buttons */
+.btn-save {
+    background: var(--primary-green);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 14px;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.2s;
 }
 
-    .mood-btn.selected {
-        border-color: var(--primary-green);
-        background: var(--accent-light);
-        transform: scale(1.1);
+    .btn-save:hover {
+        filter: brightness(1.1);
+        transform: translateY(-2px);
     }
 
-.content-area {
-    flex: 1;
+.btn-back {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 20px;
-    font-size: 1.1rem;
     color: var(--text-primary);
-    line-height: 1.6;
-    resize: none;
-    outline: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
