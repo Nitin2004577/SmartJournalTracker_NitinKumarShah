@@ -12,27 +12,27 @@
 <div class="container-fluid p-4">
     @* --- HEADER --- *@
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold m-0">Journal History</h2>
+        <h2 class="fw-bold m-0 theme-text">Journal History</h2>
         <div class="text-end">
-            <span class="badge bg-primary rounded-pill">@FilteredEntries.Count Total</span>
+            <span class="badge rounded-pill theme-badge">@FilteredEntries.Count Total</span>
         </div>
     </div>
 
     @* --- EXPORT SECTION (Date Range) --- *@
-    <div class="card shadow-sm border-0 mb-4 bg-light rounded-3">
+    <div class="card theme-card border-0 mb-4 rounded-3 shadow-sm">
         <div class="card-body p-3">
-            <h6 class="fw-bold mb-3">Export Journals to PDF</h6>
+            <h6 class="fw-bold mb-3 theme-text">Export Journals to PDF</h6>
             <div class="row g-2 align-items-end">
                 <div class="col-md-4">
-                    <label class="small fw-bold">From:</label>
-                    <input type="date" class="form-control form-control-sm" @bind="StartDate" />
+                    <label class="small fw-bold theme-muted">From:</label>
+                    <input type="date" class="form-control theme-input" @bind="StartDate" />
                 </div>
                 <div class="col-md-4">
-                    <label class="small fw-bold">To:</label>
-                    <input type="date" class="form-control form-control-sm" @bind="EndDate" />
+                    <label class="small fw-bold theme-muted">To:</label>
+                    <input type="date" class="form-control theme-input" @bind="EndDate" />
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-primary btn-sm w-100" @onclick="ExportToPdf" disabled="@isExporting">
+                    <button class="btn btn-primary w-100" @onclick="ExportToPdf" disabled="@isExporting">
                         @if (isExporting)
                         {
                             <span class="spinner-border spinner-border-sm"></span>
@@ -46,22 +46,24 @@
             </div>
             @if (!string.IsNullOrEmpty(statusMessage))
             {
-                <div class="small mt-2 text-success fw-bold">@statusMessage</div>
+                <div class="small mt-2 fw-bold @(statusMessage.Contains("✅") ? "text-success" : "text-danger")">
+                    @statusMessage
+                </div>
             }
         </div>
     </div>
 
     @* --- SEARCH & FILTER SECTION --- *@
-    <div class="card shadow-sm border-0 mb-4 bg-white rounded-3">
+    <div class="card theme-card border-0 mb-4 rounded-3 shadow-sm">
         <div class="card-body p-3">
             <div class="row g-2">
                 <div class="col-md-6">
-                    <input type="text" class="form-control border-light bg-light" 
-                           placeholder="Search your memories..." 
+                    <input type="text" class="form-control theme-input"
+                           placeholder="Search your memories..."
                            @bind="searchTerm" @bind:event="oninput" @onkeyup="ApplyFilters" />
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select border-light bg-light" @onchange="OnMoodFilterChanged">
+                    <select class="form-select theme-input" @onchange="OnMoodFilterChanged">
                         <option value="">All Moods</option>
                         @foreach (var mood in UniqueMoods)
                         {
@@ -70,34 +72,34 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-outline-secondary w-100" @onclick="ResetFilters">Reset Filters</button>
+                    <button class="btn btn-outline-secondary w-100 theme-btn-outline" @onclick="ResetFilters">Reset Filters</button>
                 </div>
             </div>
         </div>
     </div>
 
-    @* --- THE PAGINATED LIST --- *@
+    @* --- THE LIST --- *@
     <div class="journal-list-container">
         @if (!PaginatedEntries.Any())
         {
-            <div class="text-center py-5 bg-white rounded shadow-sm">
-                <p class="text-muted mb-0">No entries found for this page or filter.</p>
+            <div class="text-center py-5 theme-card rounded shadow-sm">
+                <p class="theme-muted mb-0">No entries found for this page or filter.</p>
             </div>
         }
         else
         {
             @foreach (var entry in PaginatedEntries)
             {
-                <div class="card border-0 shadow-sm mb-3 journal-card" @onclick="() => ViewEntry(entry)">
+                <div class="card border-0 shadow-sm mb-3 journal-card theme-card" @onclick="() => ViewEntry(entry)">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h5 class="fw-bold text-dark mb-1">@entry.Title</h5>
-                                <p class="text-muted small mb-2">@entry.Date.ToString("MMMM dd, yyyy")</p>
+                                <h5 class="fw-bold theme-text mb-1">@entry.Title</h5>
+                                <p class="theme-muted small mb-2">@entry.Date.ToString("MMMM dd, yyyy")</p>
                             </div>
-                            <span class="badge bg-info text-dark">@entry.PrimaryMood</span>
+                            <span class="badge theme-mood-badge">@entry.PrimaryMood</span>
                         </div>
-                        <p class="text-secondary text-truncate">@StripHtml(entry.Content)</p>
+                        <p class="theme-muted text-truncate">@StripHtml(entry.Content)</p>
                     </div>
                 </div>
             }
@@ -108,27 +110,102 @@
     @if (TotalPages > 0)
     {
         <div class="d-flex justify-content-center align-items-center gap-4 mt-4">
-            <button class="btn btn-dark rounded-circle" 
-                    disabled="@(currentPage == 1)" 
-                    @onclick="PrevPage" 
-                    style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                ❮
-            </button>
-            <span class="fw-bold">Page @currentPage of @TotalPages</span>
-            <button class="btn btn-dark rounded-circle" 
-                    disabled="@(currentPage == TotalPages)" 
-                    @onclick="NextPage"
-                    style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                ❯
-            </button>
+            <button class="btn btn-theme-round" disabled="@(currentPage == 1)" @onclick="PrevPage">❮</button>
+            <span class="fw-bold theme-text">Page @currentPage of @TotalPages</span>
+            <button class="btn btn-theme-round" disabled="@(currentPage == TotalPages)" @onclick="NextPage">❯</button>
         </div>
     }
 </div>
 
 <style>
-    .journal-card { cursor: pointer; transition: transform 0.2s; border-left: 4px solid transparent; }
-    .journal-card:hover { transform: translateX(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; border-left: 4px solid #0d6efd; }
-    .text-truncate { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    /* Dark Mode Aware Styles */
+    .theme-text {
+        color: var(--text-primary);
+    }
+
+    .theme-muted {
+        color: var(--text-muted);
+    }
+
+    .theme-card {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color) !important;
+    }
+
+    .theme-input {
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+        .theme-input:focus {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem var(--accent-light);
+        }
+
+    .theme-badge {
+        background-color: var(--primary-green);
+        color: #fff;
+    }
+
+    .theme-mood-badge {
+        background-color: var(--accent-light);
+        color: var(--primary-green);
+        border: 1px solid var(--primary-green);
+    }
+
+    .theme-btn-outline {
+        color: var(--text-muted);
+        border-color: var(--border-color);
+    }
+
+        .theme-btn-outline:hover {
+            background-color: var(--accent-light);
+            color: var(--primary-green);
+        }
+
+    .journal-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-left: 5px solid transparent !important;
+    }
+
+        .journal-card:hover {
+            transform: translateX(8px);
+            border-left: 5px solid var(--primary-green) !important;
+            background-color: var(--accent-light);
+        }
+
+    .btn-theme-round {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-theme-round:disabled {
+            opacity: 0.4;
+        }
+
+        .btn-theme-round:hover:not(:disabled) {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+    .text-truncate {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 
 @code {
@@ -138,9 +215,8 @@
     private string searchTerm = "";
     private string selectedMood = "";
     private int currentPage = 1;
-    private int pageSize = 8; 
+    private int pageSize = 8;
 
-    // Export Variables
     private DateTime StartDate { get; set; } = DateTime.Today.AddMonths(-1);
     private DateTime EndDate { get; set; } = DateTime.Today;
     private bool isExporting = false;
@@ -163,8 +239,8 @@
     private void ApplyFilters()
     {
         FilteredEntries = AllEntries
-            .Where(e => (string.IsNullOrWhiteSpace(searchTerm) || 
-                         (e.Title?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) || 
+            .Where(e => (string.IsNullOrWhiteSpace(searchTerm) ||
+                         (e.Title?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
                          (e.Content?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)) &&
                         (string.IsNullOrEmpty(selectedMood) || e.PrimaryMood == selectedMood))
             .ToList();
@@ -184,96 +260,48 @@
                 .OrderBy(e => e.Date)
                 .ToList();
 
-            if (!entriesToExport.Any()) return;
+            if (!entriesToExport.Any()) { statusMessage = "⚠️ No entries found in range."; return; }
 
             var document = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Margin(40);
-                    page.Header().PaddingBottom(20).Text("My Journal History").FontSize(28).Bold().FontColor("#2563eb");
-
+                    page.Header().PaddingBottom(20).Text("My Journal History").FontSize(28).Bold().FontColor("#2d6a4f");
                     page.Content().Column(col =>
                     {
                         foreach (var entry in entriesToExport)
                         {
-                            col.Item().PaddingBottom(20).Decoration(decoration =>
+                            col.Item().PaddingBottom(20).Decoration(dec =>
                             {
-                                decoration.Content().Border(1).BorderColor(Colors.Grey.Lighten2).Padding(15).Column(entryCol =>
+                                dec.Content().Border(1).BorderColor("#d8f3dc").Padding(15).Column(eCol =>
                                 {
-                                    // HEADER ROW: Date Display
-                                    entryCol.Item().Row(row =>
+                                    eCol.Item().Row(row =>
                                     {
-                                        row.RelativeItem().Column(dateCol =>
+                                        row.RelativeItem().Column(d =>
                                         {
-                                            dateCol.Item().Text(entry.Date.Day.ToString()).FontSize(22).Bold();
-                                            dateCol.Item().Text($"{entry.Date:MMMM} {entry.Date.Year}").FontSize(10).FontColor(Colors.Grey.Medium);
+                                            d.Item().Text(entry.Date.Day.ToString()).FontSize(22).Bold();
+                                            d.Item().Text($"{entry.Date:MMMM yyyy}").FontSize(10).FontColor("#64748b");
                                         });
-
-                                        row.RelativeItem().AlignRight().Text(entry.PrimaryMood).Italic().FontColor("#0d6efd");
+                                        row.RelativeItem().AlignRight().Text(entry.PrimaryMood).Italic().FontColor("#2d6a4f");
                                     });
-
-                                    entryCol.Item().PaddingVertical(10).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten3);
-
-                                    // TITLE
-                                    entryCol.Item().PaddingBottom(5).Text(entry.Title).FontSize(16).Bold();
-
-                                    // PILLS (Moods and Tags)
-                                    entryCol.Item().PaddingBottom(10).Row(row =>
-                                    {
-                                        row.Spacing(5);
-
-                                        // Primary Mood Pill
-                                        row.ConstantItem(60).Background("#e1f5fe").PaddingHorizontal(5).AlignCenter().Text(entry.PrimaryMood).FontSize(8).FontColor("#0288d1");
-
-                                        // Secondary Moods
-                                        if (!string.IsNullOrEmpty(entry.SecondaryMood1))
-                                            row.ConstantItem(60).Background("#f5f5f5").PaddingHorizontal(5).AlignCenter().Text(entry.SecondaryMood1).FontSize(8);
-
-                                        if (!string.IsNullOrEmpty(entry.SecondaryMood2))
-                                            row.ConstantItem(60).Background("#f5f5f5").PaddingHorizontal(5).AlignCenter().Text(entry.SecondaryMood2).FontSize(8);
-
-                                        // Tags (split and show first 3)
-                                        if (!string.IsNullOrEmpty(entry.Tags))
-                                        {
-                                            foreach (var tag in entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).Take(3))
-                                            {
-                                                row.ConstantItem(50).Border(0.5f).BorderColor(Colors.Grey.Lighten2).PaddingHorizontal(5).AlignCenter().Text($"#{tag.Trim()}").FontSize(7);
-                                            }
-                                        }
-                                    });
-
-                                    // CONTENT AREA
-                                    entryCol.Item().Text(StripHtml(entry.Content)).FontSize(11).LineHeight(1.4f);
+                                    eCol.Item().PaddingVertical(8).LineHorizontal(0.5f).LineColor("#d8f3dc");
+                                    eCol.Item().PaddingBottom(5).Text(entry.Title).FontSize(16).Bold();
+                                    eCol.Item().Text(StripHtml(entry.Content)).FontSize(11).LineHeight(1.4f);
                                 });
                             });
                         }
                     });
-
-                    page.Footer().AlignCenter().Text(x => { x.Span("Page "); x.CurrentPageNumber(); });
                 });
             });
 
-            var pdfBytes = document.GeneratePdf();
-            using var stream = new MemoryStream(pdfBytes);
+            using var stream = new MemoryStream(document.GeneratePdf());
             var fileName = $"Journal_Export_{DateTime.Now:yyyyMMdd}.pdf";
-
-            var fileSaveResult = await FileSaver.Default.SaveAsync(fileName, stream, default);
-
-            if (fileSaveResult.IsSuccessful)
-            {
-                statusMessage = "✅ Export Successful!";
-            }
+            var result = await FileSaver.Default.SaveAsync(fileName, stream, default);
+            if (result.IsSuccessful) statusMessage = "✅ PDF Saved Successfully!";
         }
-        catch (Exception ex)
-        {
-            statusMessage = "❌ Error: " + ex.Message;
-        }
-        finally
-        {
-            isExporting = false;
-            StateHasChanged();
-        }
+        catch (Exception ex) { statusMessage = "❌ Error: " + ex.Message; }
+        finally { isExporting = false; StateHasChanged(); }
     }
 
     private IEnumerable<JournalEntry> PaginatedEntries => FilteredEntries.Skip((currentPage - 1) * pageSize).Take(pageSize);
@@ -287,7 +315,6 @@
     private string StripHtml(string html)
     {
         if (string.IsNullOrEmpty(html)) return "";
-        // Replace block tags with spaces to avoid word mashing
         var formatted = System.Text.RegularExpressions.Regex.Replace(html, "<(p|br|li|div).*?>", " ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         return System.Net.WebUtility.HtmlDecode(System.Text.RegularExpressions.Regex.Replace(formatted, "<.*?>", string.Empty)).Trim();
     }

@@ -14,12 +14,23 @@
     font-weight: 800;
     text-align: center;
     padding: 2.5rem 1rem;
-    /* Uses the "Green more green" in dark mode automatically */
     color: var(--primary-green);
     background-color: var(--bg-card);
     transition: all 0.4s ease;
     border-bottom: 1px solid var(--border-color);
 }
+
+/* --- FIX FOR DOTS --- */
+.pages-lists {
+    list-style: none; /* Removes the bullet points */
+    padding-left: 0; /* Removes default indentation */
+    margin: 0; /* Removes default list margins */
+}
+
+.nav-item {
+    list-style-type: none; /* Extra safety to ensure no dots appear */
+}
+/* -------------------- */
 
 /* NavLinks Base Style */
 ::deep .nav-link {
@@ -41,10 +52,10 @@
         transform: translateX(5px);
     }
 
-    /* Active State (The page you are currently on) */
+    /* Active State */
     ::deep .nav-link.active {
         background-color: var(--primary-green) !important;
-        color: var(--bg-main) !important; /* High contrast: Dark text on bright background in dark mode */
+        color: #ffffff !important; /* Forces white text on green active background */
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         font-weight: 700;
     }
@@ -53,4 +64,6 @@
 .nav-icon {
     margin-right: 12px;
     font-size: 1.2rem;
+    width: 24px; /* Keeps text labels aligned */
+    text-align: center;
 }

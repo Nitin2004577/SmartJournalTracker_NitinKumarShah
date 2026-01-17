@@ -13,30 +13,23 @@
                 </NavLink>
             </li>
             <li class="nav-item">
+                <NavLink class="nav-link" href="/journals">
+                    <span class="nav-icon">📖</span> Journals
+                </NavLink>
+            </li>
+            <li class="nav-item">
                 <NavLink class="nav-link" href="/calendar">
                     <span class="nav-icon">📅</span> Calendar
                 </NavLink>
             </li>
             <li class="nav-item">
-                @* Links to Today's Entry specifically *@
                 <NavLink class="nav-link" href="@($"/journal/edit/{DateTime.Now:yyyy-MM-dd}")">
                     <span class="nav-icon">✍️</span> Create
                 </NavLink>
             </li>
             <li class="nav-item">
-                <NavLink class="nav-link" href="/analytics">
-                    <span class="nav-icon">📊</span> Analytics
-                </NavLink>
-            </li>
-            <li class="nav-item">
                 <NavLink class="nav-link" href="/settings">
                     <span class="nav-icon">⚙️</span> Settings
-                </NavLink>
-            </li>
-
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/journals">
-                    <span class="nav-icon"></span> Journals
                 </NavLink>
             </li>
         </ul>
