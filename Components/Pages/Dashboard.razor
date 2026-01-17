@@ -1,0 +1,214 @@
+﻿@page "/"
+@using smart_journal.Models
+@using smart_journal.Data
+@inject AppDatabase Database
+
+<div class="container-fluid p-4">
+    <h2 class="fw-bold mb-4">Insights & Analytics</h2>
+
+    @* --- STREAK STATS CARDS --- *@
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white p-3 text-center">
+                <h6 class="text-uppercase small opacity-75">Current Streak</h6>
+                <h2 class="fw-bold m-0">🔥 @CurrentStreak Days</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-dark text-white p-3 text-center">
+                <h6 class="text-uppercase small opacity-75">Longest Streak</h6>
+                <h2 class="fw-bold m-0">🏆 @LongestStreak Days</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-white p-3 text-center">
+                <h6 class="text-uppercase small text-muted">Missed Days (Month)</h6>
+                <h2 class="fw-bold m-0 text-danger">📉 @MissedDays</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @* --- MOOD DISTRIBUTION --- *@
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Mood Distribution</h5>
+                    @if (!MoodCounts.Any())
+                    {
+                        <p class="text-muted">Write more entries to see mood trends.</p>
+                    }
+                    @foreach (var mood in MoodCounts.OrderByDescending(m => m.Value))
+                    {
+                        var percentage = (double)mood.Value / TotalEntries * 100;
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>@mood.Key</span>
+                                <span class="fw-bold">@mood.Value</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-info" style="width: @($"{percentage}%")"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* --- TAG BREAKDOWN --- *@
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Most Used Tags</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (!TagCounts.Any())
+                        {
+                            <p class="text-muted">No tags found.</p>
+                        }
+                        @foreach (var tag in TagCounts.OrderByDescending(t => t.Value).Take(15))
+                        {
+                            <span class="badge bg-light text-dark border p-2">
+                                #@tag.Key <span class="ms-1 text-primary">(@tag.Value)</span>
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- WORD COUNT TRENDS --- *@
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Writing Volume (Word Count)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Title</th>
+                                    <th>Words</th>
+                                    <th>Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in AllEntries.Take(7))
+                                {
+                                    <tr>
+                                        <td>@entry.Date.ToString("MMM dd")</td>
+                                        <td class="text-truncate" style="max-width: 150px;">@entry.Title</td>
+                                        <td>@GetWordCount(entry.Content)</td>
+                                        <td class="w-25">
+                                            <div class="progress" style="height: 5px; margin-top: 8px;">
+                                                <div class="progress-bar bg-success" 
+                                                     style="width: @(Math.Min(GetWordCount(entry.Content) / 5, 100))%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<JournalEntry> AllEntries = new();
+    private Dictionary<string, int> MoodCounts = new();
+    private Dictionary<string, int> TagCounts = new();
+    private int TotalEntries;
+    private int CurrentStreak;
+    private int LongestStreak;
+    private int MissedDays;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await Database.GetEntriesAsync();
+        AllEntries = data.OrderByDescending(e => e.Date).ToList();
+        TotalEntries = AllEntries.Count;
+
+        CalculateMoods();
+        CalculateTags();
+        CalculateStreaks();
+    }
+
+    private void CalculateMoods()
+    {
+        MoodCounts = AllEntries
+            .Where(e => !string.IsNullOrEmpty(e.PrimaryMood))
+            .GroupBy(e => e.PrimaryMood)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
+    private void CalculateTags()
+    {
+        var allTags = AllEntries
+            .Where(e => !string.IsNullOrEmpty(e.Tags))
+            .SelectMany(e => e.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            .Select(t => t.Trim());
+
+        TagCounts = allTags
+            .GroupBy(t => t)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
+    private void CalculateStreaks()
+    {
+        if (!AllEntries.Any()) return;
+
+        var dates = AllEntries.Select(e => e.Date.Date).Distinct().OrderByDescending(d => d).ToList();
+        DateTime today = DateTime.Today;
+
+        // 1. Current Streak
+        int current = 0;
+        DateTime checkDate = dates.Contains(today) ? today : today.AddDays(-1);
+        
+        while (dates.Contains(checkDate))
+        {
+            current++;
+            checkDate = checkDate.AddDays(-1);
+        }
+        CurrentStreak = current;
+
+        // 2. Longest Streak
+        int longest = 0;
+        int tempLongest = 0;
+        var sortedAsc = dates.OrderBy(d => d).ToList();
+        
+        for (int i = 0; i < sortedAsc.Count; i++)
+        {
+            tempLongest++;
+            if (i == sortedAsc.Count - 1 || sortedAsc[i + 1] != sortedAsc[i].AddDays(1))
+            {
+                if (tempLongest > longest) longest = tempLongest;
+                tempLongest = 0;
+            }
+        }
+        LongestStreak = longest;
+
+        // 3. Missed Days (in the last 30 days)
+        int entryCountLast30 = dates.Count(d => d >= today.AddDays(-30));
+        MissedDays = 30 - entryCountLast30;
+    }
+
+    private int GetWordCount(string html)
+    {
+        if (string.IsNullOrEmpty(html)) return 0;
+
+        // 1. Replace block-level tags with spaces so words don't mash together
+        // This handles <li>, <p>, <br>, <div> etc.
+        string formattedText = System.Text.RegularExpressions.Regex.Replace(html, "<(p|br|li|div|h1|h2|h3|ol|ul).*?>", " ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // 2. Strip all remaining HTML tags
+        var plainText = System.Text.RegularExpressions.Regex.Replace(formattedText, "<.*?>", string.Empty);
+
+        // 3. Decode HTML entities (like &nbsp; or &amp;) which often appear in editors
+        plainText = System.Net.WebUtility.HtmlDecode(plainText);
+
+        // 4. Split by whitespace and count
+        return plainText.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+    }
+}

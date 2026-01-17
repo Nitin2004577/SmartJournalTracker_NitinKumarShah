@@ -1,5 +1,5 @@
-﻿using SQLite;
-using smart_journal.Models;
+﻿using smart_journal.Models;
+using SQLite;
 
 namespace smart_journal.Data
 {

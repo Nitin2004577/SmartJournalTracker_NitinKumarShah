@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace smart_journal.Services
+﻿namespace smart_journal.Services
 {
     public class AppState
     {
