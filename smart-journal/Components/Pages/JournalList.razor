@@ -337,4 +337,4 @@
         var formatted = System.Text.RegularExpressions.Regex.Replace(html, "<(p|br|li|div).*?>", " ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         return System.Net.WebUtility.HtmlDecode(System.Text.RegularExpressions.Regex.Replace(formatted, "<.*?>", string.Empty)).Trim();
     }
-}s
+}
