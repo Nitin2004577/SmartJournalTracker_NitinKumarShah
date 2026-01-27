@@ -7,7 +7,7 @@ namespace smart_journal.Data
     {
         private SQLiteAsyncConnection _db;
 
-        // The "Init" method ensures the database exists before we use it
+        // The "Init" method ensures the database exists before using it
         private async Task Init()
         {
             if (_db is not null) return;
@@ -61,7 +61,6 @@ namespace smart_journal.Data
                 await _db.DeleteAsync(entry);
         }
 
-        // Add this method to your AppDatabase class
         public async Task<List<JournalEntry>> GetEntriesAsync()
         {
             await Init();

@@ -20,7 +20,6 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-/* --- FIX FOR DOTS --- */
 .pages-lists {
     list-style: none; /* Removes the bullet points */
     padding-left: 0; /* Removes default indentation */
